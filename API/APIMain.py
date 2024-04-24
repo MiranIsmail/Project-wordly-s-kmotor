@@ -14,17 +14,17 @@ app = FastAPI()
 # Load the environment variables from the .env file.
 load_dotenv('infoContainer.env')
 secretInfo = {
-    "host": os.getenv('HOST'),
-    "user": os.getenv('USER'),
-    "password": os.getenv('PASSWORD'),
-    "database": os.getenv('DATABASE')
+    "host": os.getenv("HOST"),
+    "user": os.getenv("name"),
+    "password": os.getenv("PASSWORD"),
+    "database": os.getenv("DATABASE")
 }
 
 db = mysql.connector.connect(
-    host=secretInfo['host'],
-    user=secretInfo['user'],
-    password=secretInfo['password'],
-    database=secretInfo['database'],
+    host=secretInfo["host"],
+    user=secretInfo["user"],
+    password=secretInfo["password"],
+    database=secretInfo["database"]
 )
 
 class CustomMiddleware(BaseHTTPMiddleware):
