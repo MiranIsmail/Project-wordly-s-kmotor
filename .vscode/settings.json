@@ -1,0 +1,17 @@
+{
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "158.179.201.113",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "egen",
+      "database": "miim21",
+      "username": "miim21"
+    }
+  ]
+}
