@@ -4,3 +4,4 @@ API/__pycache__/APIMain.cpython-311.pyc
 *.pyc
 egen-oracle.session.sql
 infoContainer.env
+API/svenska-ord.json

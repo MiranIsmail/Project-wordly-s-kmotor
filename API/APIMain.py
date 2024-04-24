@@ -64,17 +64,18 @@ def read_items():
 @app.get("/addWords/")
 def add_words():
     cursor = db.cursor()
-    word = "HelloWorld"
 
     query = "INSERT INTO word (word, length) VALUES (%s, %s)"
 
     try:        
         data = getListOfWordsFromFile()
         WordInsertTuple = [(word, len(word)) for word in data]
+
+        print('Inserting words into the database...')
         cursor.executemany(query, WordInsertTuple)
-        # for word in data:
-        #     cursor.execute("INSERT INTO word (word, length) VALUES ('" + word + "'," + str(len(word)) + ")")
-        #     print("Added word: " + word)
+        print('Words inserted successfully!')
+
+        return {"message": "Words inserted successfully!"}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
