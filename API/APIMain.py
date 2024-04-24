@@ -7,7 +7,6 @@ import os
 import preRequest
 import postRequest
 import classes
-import json
 
 app = FastAPI()
 
@@ -60,28 +59,3 @@ def read_items():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
-
-@app.get("/addWords/")
-def add_words():
-    cursor = db.cursor()
-    word = "HelloWorld"
-
-    query = "INSERT INTO word (word, length) VALUES (%s, %s)"
-
-    try:        
-        data = getListOfWordsFromFile()
-        WordInsertTuple = [(word, len(word)) for word in data]
-        cursor.executemany(query, WordInsertTuple)
-        # for word in data:
-        #     cursor.execute("INSERT INTO word (word, length) VALUES ('" + word + "'," + str(len(word)) + ")")
-        #     print("Added word: " + word)
-
-    except Error as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-
-
-def getListOfWordsFromFile():
-    f = open("svenska-ord.json", "r", encoding="utf-8")
-    return json.load(f)
