@@ -1,9 +1,21 @@
+@keyframes spin {
+  0% {
+    transform: scale(1.5) rotate(0deg);
+  }
+  50% {
+    transform: scale(0.9) rotate(360deg);
+  }
+  100% {
+    transform: scale(1.5) rotate(720deg);
+  }
+}
+
 .Home {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: normal;
-  height: 10vh;
+  height: 7vh;
   width: 100%;
   background-color: #282c34;
   color: white;
@@ -14,6 +26,7 @@
 }
 .logo:hover {
   cursor: pointer;
+  animation: spin 2s linear infinite;
 }
 .menu {
   display: flex;
