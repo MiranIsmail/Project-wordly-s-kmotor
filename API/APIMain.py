@@ -30,16 +30,23 @@ db = mysql.connector.connect(
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         '''This middleware will run before and after the request is processed.'''
+        # Extract key parameter from path. Default to None if not present.
+        # This is used to identify the user.
+        try:
+            key = request.query_params['key']
+        
+        except KeyError:
+            key = None
 
         # Code to run before the request
         sessionUserClass = classes.UserSessionData()
-        preRequest.preRequest(sessionUserClass)
+        preRequest.preRequest(sessionUserClass, key= key)
 
         # Process the request
         response = await call_next(request)
 
         # Code to run after the request
-        postRequest.postRequest(sessionUserClass, db)
+        postRequest.postRequest(sessionUserClass, db= db, key= key)
         return response
 
 # Add middleware to the app
@@ -49,11 +56,17 @@ app.add_middleware(CustomMiddleware)
 #Views go here
 
 # This is only for testing purposes.
-@app.get("/items/")
-def read_items():
+@app.get("/users/")
+def read_items(id: int = None):
     cursor = db.cursor()
+    print(id)
     try:
-        cursor.execute("SELECT * FROM user")
+        if id:
+            print('lol')
+            cursor.execute("SELECT * FROM user WHERE UserId = %s", (id,))
+            print('lol')
+        else:
+            cursor.execute("SELECT * FROM user")
         result = cursor.fetchall()
         return {"items": result}
     except Error as e:
@@ -82,6 +95,24 @@ def add_words():
     finally:
         cursor.close()
 
+# Create a user with the given parameters.
+@app.get("/createUser/")
+def create_user(email: str, psw: str, fName: str, lName: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not email or not psw or not fName or not lName:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT CreateUser(%s, %s, %s, %s) as accountCreated", (email, fName, lName, psw))
+
+        return {"message": cursor.fetchone()[0]}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
 
 def getListOfWordsFromFile():
     f = open("svenska-ord.json", "r", encoding="utf-8")
