@@ -15,7 +15,7 @@ app = FastAPI()
 load_dotenv('infoContainer.env')
 secretInfo = {
     "host": os.getenv("HOST"),
-    "user": os.getenv("name"),
+    "user": os.getenv("NAME"),
     "password": os.getenv("PASSWORD"),
     "database": os.getenv("DATABASE")
 }
