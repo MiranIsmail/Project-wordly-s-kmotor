@@ -1,5 +1,5 @@
 import "./navbar.css";
-import logo from "./logo.png";
+import logo from "../pics/logo.png";
 
 function Navbar() {
   const handleH3Click = (event) => {
@@ -19,19 +19,25 @@ function Navbar() {
   };
 
   return (
-    <nav className="Home">
-      <img src={logo} onClick={handleLogoClick} alt="logo" className="logo" />
-      <div className="menu">
+    <div className="Home">
+      <div className="left">
+        <img src={logo} onClick={handleLogoClick} alt="logo" className="logo" />
         <div className="menu-items">
           <h3 onClick={handleH3Click}>Home</h3>
           <h3 onClick={handleH3Click}>Profile</h3>
           <h3 onClick={handleH3Click}>Scoreboard</h3>
           <h3 onClick={handleH3Click}>About</h3>
         </div>
-        <div className="menu-space"></div>
       </div>
-      <input onKeyDown={handleSearch} type="search" placeholder="  Search..." />
-    </nav>
+      <div className="right">
+        <div className="menu-space"></div>
+        <input
+          onKeyDown={handleSearch}
+          type="search"
+          placeholder="  Search..."
+        />
+      </div>
+    </div>
   );
 }
 

@@ -2,12 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import Home from "./Home.js";
-
+import Navbar from "./customComp/navbar.js";
+import FrontPage from "./customComp/frontPage.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Home />
+    <Navbar />
+    <FrontPage />
   </React.StrictMode>
 );
 
