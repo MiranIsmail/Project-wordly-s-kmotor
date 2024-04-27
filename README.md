@@ -10,7 +10,7 @@ Kopiera och installera följande:
 
 1. För att kunna köra med en databas ska en .env fil som heter infoContainer.env skapas. I denna fil ska föjande 'keys' finnas med:
 * HOST
-* USER
+* NAME
 * PASSWORD
 * DATABASE
 
