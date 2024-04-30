@@ -2,10 +2,12 @@ import "./navbar.css";
 import logo from "../pics/logo.png";
 import audio from "../audio/drive.mp3";
 import React, { useRef, useEffect } from "react";
+import { Link } from 'react-router-dom';
+
 
 function Navbar() {
   const audioRef = useRef(new Audio(audio));
-
+  
   useEffect(() => {
     const logo = document.querySelector(".logo");
     logo.addEventListener("mouseover", () => {
@@ -16,14 +18,20 @@ function Navbar() {
       audioRef.current.currentTime = 0;
     });
   }, []);
+
+
   const handleH3Click = (event) => {
     const page = event.target.innerText.toLowerCase();
     window.open = `localhost/${page}`;
     console.log(page);
   };
+
+
   const handleLogoClick = (event) => {
     window.open = "localhost";
   };
+
+
   const handleSearch = (event) => {
     if (event.key === "Enter") {
       const search = event.target.value.toLowerCase();
@@ -36,11 +44,14 @@ function Navbar() {
     <div className="Home">
       <div className="left">
         <img src={logo} onClick={handleLogoClick} alt="logo" className="logo" />
-        <div className="menu-items">
-          <h3 onClick={handleH3Click}>Home</h3>
-          <h3 onClick={handleH3Click}>Profile</h3>
-          <h3 onClick={handleH3Click}>Scoreboard</h3>
-          <h3 onClick={handleH3Click}>About</h3>
+        <Link className="HomeLogoLink" to="/">
+          <h2 >WordleSheet</h2>
+        </Link>
+        <div className="links">
+        <Link to="/">Home</Link>
+        <Link to="/about">Scoreboard</Link>
+        <Link to="/about">About</Link>
+        <Link to="/about">Profile</Link>
         </div>
       </div>
       <div className="right">

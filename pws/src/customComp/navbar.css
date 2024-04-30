@@ -28,7 +28,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 30%;
+  width: 60%;
   height: 100%;
 }
 .logo {
@@ -41,17 +41,30 @@
   animation: spin 2s linear infinite;
 }
 
-.menu-items {
+.links {
   display: flex;
   flex-direction: row;
   align-items: left;
   justify-content: space-between;
   width: 75%;
   height: auto;
+  text-decoration: none;
 }
-.menu-items > h3:hover {
+
+.Home a {
+  color: white;
+  text-decoration: none;
+  margin-right: 5%;
+}
+.links a:hover {
   color: #61dafb;
-  cursor: pointer;
+}
+
+.HomeLogoLink {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+  margin-right: 20px;
 }
 /**/
 
@@ -60,7 +73,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 70%;
+  width: 90%;
   height: 100%;
 }
 .menu-space {

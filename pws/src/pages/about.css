@@ -1,0 +1,12 @@
+.about{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f1f1f1;
+    font-size: 2rem;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    padding: 0 1rem;
+}
