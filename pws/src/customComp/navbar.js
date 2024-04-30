@@ -1,7 +1,21 @@
 import "./navbar.css";
 import logo from "../pics/logo.png";
+import audio from "../audio/drive.mp3";
+import React, { useRef, useEffect } from "react";
 
 function Navbar() {
+  const audioRef = useRef(new Audio(audio));
+
+  useEffect(() => {
+    const logo = document.querySelector(".logo");
+    logo.addEventListener("mouseover", () => {
+      audioRef.current.play();
+    });
+    logo.addEventListener("mouseout", () => {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    });
+  }, []);
   const handleH3Click = (event) => {
     const page = event.target.innerText.toLowerCase();
     window.open = `localhost/${page}`;
