@@ -1,16 +1,22 @@
-"./about.css";
+import "./about.css";
 
-const AboutPage = () => {
-  return ( 
-    <div className="about">
-      <h1>About</h1>
-      <p>
-        This is a simple word game where you have to guess the word. You can
-        enter the letters you know and the letters you don't know. The game will
-        show you the words that match the criteria.
-      </p>
+function AboutPage() {
+  return (
+    <div className="home">
+      <div className="home_header">
+        <h1>About</h1>
+      </div>
+      <div className="home_content">
+        <p>
+          This is a very simple search motor for words that can be used to solve
+          games like Wordle. It is a work in progress and we are adding new
+          features. We are two unvieristy students and we are doing this project
+          for fun.
+        </p>
+        <p className="p2"> We hope you enjoy it and welcome any feedback.</p>
+      </div>
     </div>
-   );
+  );
 }
- 
+
 export default AboutPage;

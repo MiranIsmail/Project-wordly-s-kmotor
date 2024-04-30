@@ -1,16 +1,10 @@
-import Navbar from './customComp/navbar.js';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AboutPage from './pages/about.js';
-import FrontPage from './pages/frontPage';
-
+import Navbar from "./customComp/navbar.js";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AboutPage from "./pages/about.js";
+import FrontPage from "./pages/frontPage";
+import ScoreboardPage from "./pages/scoreboard.js";
+import ProfilePage from "./pages/profile.js";
 function App() {
-  const title = 'Welcome to the new blog';
-  const likes = 50;
-  // const person = { name: 'yoshi', age: 30 };
-  const link = "http://www.google.com";
-
-  console.log(link);
-
   return (
     <Router>
       <div className="App">
@@ -19,6 +13,8 @@ function App() {
           <Routes>
             <Route path="/" element={<FrontPage />}></Route>
             <Route path="/about" element={<AboutPage />}></Route>
+            <Route path="/scoreboard" element={<ScoreboardPage />}></Route>
+            <Route path="/profile" element={<ProfilePage />}></Route>
           </Routes>
         </div>
       </div>
