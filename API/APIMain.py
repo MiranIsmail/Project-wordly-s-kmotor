@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
@@ -53,6 +54,16 @@ class CustomMiddleware(BaseHTTPMiddleware):
 app.add_middleware(CustomMiddleware)
 
 
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 #Views go here
 
 # This is only for testing purposes.
@@ -95,8 +106,9 @@ def add_words():
     finally:
         cursor.close()
 
+
 # Create a user with the given parameters.
-@app.get("/createUser/")
+@app.post("/createUser/")
 def create_user(email: str, psw: str, fName: str, lName: str):
     cursor = db.cursor()
 
@@ -107,7 +119,9 @@ def create_user(email: str, psw: str, fName: str, lName: str):
     try:
         cursor.execute("SELECT CreateUser(%s, %s, %s, %s) as accountCreated", (email, fName, lName, psw))
 
-        return {"message": cursor.fetchone()[0]}
+        couldCreate = cursor.fetchone()[0]
+
+        return {"success": couldCreate, "message": "User created successfully!" if couldCreate == 1 else "User already exists!"}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
