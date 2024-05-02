@@ -18,6 +18,6 @@ Detta är för att säkra våra tjänster.
 
 2. Sätt in rätt variabler i .env filen. Kontakta ledande chef för variabler.
 
-3. Kör Api'n med föjande kommando: ```uvicorn APIMain:app --reload```.
+3. Kör Api'n med föjande kommando: ```uvicorn APIMain:app  --reload --host 0.0.0.0 --port 8000```.
 
 4. API'n är nu uppe och igång. Du kan nu göra ändringar och sedan bara spara för att uppdatera API'n.
