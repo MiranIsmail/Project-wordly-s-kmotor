@@ -131,3 +131,25 @@ def create_user(email: str, psw: str, fName: str, lName: str):
 def getListOfWordsFromFile():
     f = open("svenska-ord.json", "r", encoding="utf-8")
     return json.load(f)
+
+
+# Loggs in the user with the given email and password.
+@app.post("/loginUser/")
+def login_user(email: str, psw: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not email or not psw:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT LoginUser(%s, %s) as userKey", (email, psw))
+
+        userKey = cursor.fetchone()[0]
+
+        return {"success": userKey, 'message': "User logged in successfully!" if userKey else "Invalid credentials!"}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
