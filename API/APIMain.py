@@ -9,6 +9,7 @@ import preRequest
 import postRequest
 import classes
 import json
+from hashlib import sha512
 
 app = FastAPI()
 
@@ -117,7 +118,9 @@ def create_user(email: str, psw: str, fName: str, lName: str):
         raise HTTPException(status_code=400, detail="Missing parameter(s)")
 
     try:
-        cursor.execute("SELECT CreateUser(%s, %s, %s, %s) as accountCreated", (email, fName, lName, psw))
+        # Gets the token by hashing the email and password.
+        tokenID = sha512((email + psw).encode()).hexdigest()
+        cursor.execute("SELECT CreateUser(%s, %s, %s, %s, %s) as accountCreated", (tokenID, email, fName, lName, psw))
 
         couldCreate = cursor.fetchone()[0]
 
@@ -145,9 +148,60 @@ def login_user(email: str, psw: str):
     try:
         cursor.execute("SELECT LoginUser(%s, %s) as userKey", (email, psw))
 
+        success = cursor.fetchone()[0]
+
+        # Get the user key from the database.
+        cursor.execute("SELECT `tokenID` FROM `user` WHERE email = %s AND passwordSHA512 = %s", (email, psw))
         userKey = cursor.fetchone()[0]
 
-        return {"success": userKey, 'message': "User logged in successfully!" if userKey else "Invalid credentials!"}
+        return {"success": success, 'message': "User logged in successfully!" if userKey else "Invalid credentials!", "tokenID": userKey}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get User Token
+@app.get("/getUserToken/")
+def get_user_token(email: str, psw: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not email or not psw:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        print(email)
+        print(psw)
+        # cursor.execute("SELECT `tokenID` FROM `user` WHERE email = 'silj20@student.bth.se' AND passwordSHA512 = '6118af136dcbdd816dd295f3233e4f581bc1a81a07ccc2b512b2974be0e1e49cec9982afd3fd7920a92958cde27110b309482eccc5b0a43cb666da3f383c4ab2'")
+        # print(cursor.fetchone()[0])
+        cursor.execute("SELECT `tokenID` FROM `user` WHERE email = %s AND passwordSHA512 = %s", (email, psw))
+
+        userKey = cursor.fetchone()
+        sucess = False if userKey == None else True
+
+        return {"success": sucess, 'tokenID': userKey if userKey else "Invalid credentials!"}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get User Info
+@app.get("/getUserInfo/")
+def get_user_info(tokenID: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not tokenID:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT `email`, `firstName`, `lastName` FROM `user` WHERE tokenID = %s", (tokenID,))
+
+        userInfo = cursor.fetchone()
+
+        return {"success": True, 'email': userInfo[0], 'firstName': userInfo[1], 'lastName': userInfo[2]}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
