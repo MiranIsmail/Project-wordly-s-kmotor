@@ -29,19 +29,20 @@ db = mysql.connector.connect(
     database=secretInfo["database"]
 )
 
+sessionUserClass = classes.UserSessionData()
+
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         '''This middleware will run before and after the request is processed.'''
         # Extract key parameter from path. Default to None if not present.
         # This is used to identify the user.
         try:
-            key = request.query_params['key']
+            key = request.query_params['tokenID']
         
         except KeyError:
             key = None
 
         # Code to run before the request
-        sessionUserClass = classes.UserSessionData()
         preRequest.preRequest(sessionUserClass, key= key)
 
         # Process the request
@@ -207,6 +208,34 @@ def get_user_info(tokenID: str):
         userInfo = cursor.fetchone()
 
         return {"success": True, 'email': userInfo[0], 'firstName': userInfo[1], 'lastName': userInfo[2]}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get user history
+@app.get("/getUserHistory/")
+def get_user_history():
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not sessionUserClass.key:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC", (sessionUserClass.key,))
+
+        userHistory = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        result = [dict(zip(columns, row)) for row in userHistory]
+
+        if not userHistory:
+            return {"success": False, 'message': "No history found!"}
+
+        return {"success": True, 'history': result}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))

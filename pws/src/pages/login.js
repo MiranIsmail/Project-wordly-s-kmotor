@@ -39,7 +39,7 @@ LoginPage() {
       else {
         // User successfully logged in
 
-        alert(data['message']);
+        // alert(data['message']);
         const token = data['tokenID'];
         login(token);
         navigate("/profile");

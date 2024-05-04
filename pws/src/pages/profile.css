@@ -6,7 +6,6 @@
     align-items: center;
     margin-top: 20px;
     color: white;
-
 }
 
 .profile_header {
@@ -14,11 +13,9 @@
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-    margin-bottom: 20px;
 }
 
 .profile_content {
-    /* display: flex; */
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
@@ -31,10 +28,25 @@
     margin-left: auto;
     margin-right: auto;
     border: none;
-    width: 50%;
+    width: 8%;
     border-radius: 10px;
     display: block;
     padding: 10px 20px;
     cursor: pointer;
 }
 
+
+.wordle_history_button{
+    background-color: #033ec8;
+    color: white;
+    margin-top: 5px; /* Reduced or added top margin if needed for fine-tuning */
+    margin-bottom: 10px; /* Ensure there's some space below the button */
+    margin-left: auto;
+    margin-right: auto;
+    border: none;
+    width: 30%;
+    border-radius: 10px;
+    display: block;
+    padding: 10px 20px;
+    cursor: pointer;
+}

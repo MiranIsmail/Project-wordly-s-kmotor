@@ -7,7 +7,10 @@ import ScoreboardPage from "./pages/scoreboard.js";
 import ProfilePage from "./pages/profile.js";
 import LoginPage from "./pages/login.js";
 import CreateAccountPage from "./pages/createAccount.js";
+import UserHistoryPage from './pages/userHistory.js';
+import HistoryDetailPage from './pages/histroryDetail.js';
 import { AuthProvider, useAuth } from './auth/authcontext';  // Ensure AuthProvider and useAuth are imported
+
 
 function App() {
   return (
@@ -23,6 +26,8 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute Component={ProfilePage} />}></Route>
               <Route path="/login" element={<LoginPage />}></Route>
               <Route path="/createAccount" element={<CreateAccountPage />}></Route>
+              <Route path="/userHistory" element={<ProtectedRoute Component={UserHistoryPage} />}></Route>
+              <Route path="/historyDetail/:guessID" element={<ProtectedRoute Component={HistoryDetailPage} />}></Route>
             </Routes>
           </div>
         </div>
