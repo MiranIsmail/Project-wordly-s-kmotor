@@ -8,7 +8,6 @@ const useFetch = (path, params) => {
 
 
   useEffect(() => {
-    setTimeout(() => {
         fetch(url+path+"?"+ new URLSearchParams(params)).then(res => {
             if (!res.ok) {
                 throw Error('Could not fetch the data for that resource');
@@ -24,8 +23,7 @@ const useFetch = (path, params) => {
             console.log(e.message);
             setError(e.message);
             setIsPending(false);
-        })
-    }, 1000);
+        });
   }, [url+path]);
 
   return { data, isPending, error };

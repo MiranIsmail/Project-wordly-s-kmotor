@@ -149,10 +149,15 @@ def login_user(email: str, psw: str):
         cursor.execute("SELECT LoginUser(%s, %s) as userKey", (email, psw))
 
         success = cursor.fetchone()[0]
+        print(success)
+
+        if not success:
+            return {"success": success, 'message': "Invalid credentials!", "tokenID": None}
 
         # Get the user key from the database.
         cursor.execute("SELECT `tokenID` FROM `user` WHERE email = %s AND passwordSHA512 = %s", (email, psw))
         userKey = cursor.fetchone()[0]
+        print(userKey)
 
         return {"success": success, 'message': "User logged in successfully!" if userKey else "Invalid credentials!", "tokenID": userKey}
 
