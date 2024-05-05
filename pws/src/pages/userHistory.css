@@ -1,0 +1,55 @@
+
+.user_history_page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    color: white;
+}
+
+.wordle_preview{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: auto;
+    margin-left: auto;
+    color: white;
+    width: 80%;
+    background-color: rgb(60, 60, 60);
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.wordle_preview:hover{
+    box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+.wordle_preview a{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    width: 100%;
+    background-color: rgb(60, 60, 60);
+    margin-bottom: 10px;
+    border-radius: 10px;
+    justify-content: space-between;
+    text-decoration: none;
+}
+
+.wordle_preview h2{
+    margin: 10px;
+}
+
+.wordle_guess_info{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: auto;
+    margin: 10px;
+    margin-right: 10px;
+}
+
+.wordle_guess_info p{
+    margin: 10px;
+}

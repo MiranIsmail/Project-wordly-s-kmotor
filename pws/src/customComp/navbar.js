@@ -3,9 +3,11 @@ import logo from "../pics/logo.png";
 import audio from "../audio/drive.mp3";
 import React, { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../auth/authcontext";
 
 function Navbar() {
   const audioRef = useRef(new Audio(audio));
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     const logo = document.querySelector(".logo");
@@ -45,13 +47,13 @@ function Navbar() {
         </Link>
         <div className="links">
           <Link to="/">Home</Link>
-          <Link to="/profile">Profile</Link>
           <Link to="/scoreboard">Scoreboard</Link>
           <Link to="/about">About</Link>
         </div>
       </div>
       <div className="right">
         <div className="menu-space"></div>
+        {isLoggedIn ? <Link to="/profile">Profile</Link> : <Link to="/login">Login</Link>}
         <input
           onKeyDown={handleSearch}
           type="search"

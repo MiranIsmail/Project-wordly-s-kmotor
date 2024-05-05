@@ -9,6 +9,7 @@ import preRequest
 import postRequest
 import classes
 import json
+from hashlib import sha512
 
 app = FastAPI()
 
@@ -28,19 +29,20 @@ db = mysql.connector.connect(
     database=secretInfo["database"]
 )
 
+sessionUserClass = classes.UserSessionData()
+
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         '''This middleware will run before and after the request is processed.'''
         # Extract key parameter from path. Default to None if not present.
         # This is used to identify the user.
         try:
-            key = request.query_params['key']
+            key = request.query_params['tokenID']
         
         except KeyError:
             key = None
 
         # Code to run before the request
-        sessionUserClass = classes.UserSessionData()
         preRequest.preRequest(sessionUserClass, key= key)
 
         # Process the request
@@ -117,7 +119,9 @@ def create_user(email: str, psw: str, fName: str, lName: str):
         raise HTTPException(status_code=400, detail="Missing parameter(s)")
 
     try:
-        cursor.execute("SELECT CreateUser(%s, %s, %s, %s) as accountCreated", (email, fName, lName, psw))
+        # Gets the token by hashing the email and password.
+        tokenID = sha512((email + psw).encode()).hexdigest()
+        cursor.execute("SELECT CreateUser(%s, %s, %s, %s, %s) as accountCreated", (tokenID, email, fName, lName, psw))
 
         couldCreate = cursor.fetchone()[0]
 
@@ -145,9 +149,128 @@ def login_user(email: str, psw: str):
     try:
         cursor.execute("SELECT LoginUser(%s, %s) as userKey", (email, psw))
 
-        userKey = cursor.fetchone()[0]
+        success = cursor.fetchone()[0]
+        print(success)
 
-        return {"success": userKey, 'message': "User logged in successfully!" if userKey else "Invalid credentials!"}
+        if not success:
+            return {"success": success, 'message': "Invalid credentials!", "tokenID": None}
+
+        # Get the user key from the database.
+        cursor.execute("SELECT `tokenID` FROM `user` WHERE email = %s AND passwordSHA512 = %s", (email, psw))
+        userKey = cursor.fetchone()[0]
+        print(userKey)
+
+        return {"success": success, 'message': "User logged in successfully!" if userKey else "Invalid credentials!", "tokenID": userKey}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get User Token
+@app.get("/getUserToken/")
+def get_user_token(email: str, psw: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not email or not psw:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        print(email)
+        print(psw)
+        # cursor.execute("SELECT `tokenID` FROM `user` WHERE email = 'silj20@student.bth.se' AND passwordSHA512 = '6118af136dcbdd816dd295f3233e4f581bc1a81a07ccc2b512b2974be0e1e49cec9982afd3fd7920a92958cde27110b309482eccc5b0a43cb666da3f383c4ab2'")
+        # print(cursor.fetchone()[0])
+        cursor.execute("SELECT `tokenID` FROM `user` WHERE email = %s AND passwordSHA512 = %s", (email, psw))
+
+        userKey = cursor.fetchone()
+        sucess = False if userKey == None else True
+
+        return {"success": sucess, 'tokenID': userKey if userKey else "Invalid credentials!"}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get User Info
+@app.get("/getUserInfo/")
+def get_user_info(tokenID: str):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not tokenID:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT `email`, `firstName`, `lastName` FROM `user` WHERE tokenID = %s", (tokenID,))
+
+        userInfo = cursor.fetchone()
+
+        return {"success": True, 'email': userInfo[0], 'firstName': userInfo[1], 'lastName': userInfo[2]}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get user history
+@app.get("/getUserHistory/")
+def get_user_history():
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not sessionUserClass.key:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC", (sessionUserClass.key,))
+
+        userHistory = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        result = [dict(zip(columns, row)) for row in userHistory]
+
+        if not userHistory:
+            return {"success": False, 'message': "No history found!"}
+
+        return {"success": True, 'history': result}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+# Get specific user history
+@app.get("/getUserHistory/{id}")
+def get_specific_user_history(id: int):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not sessionUserClass.key:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        # Check if the history exists and is on the same user.
+        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) AND `guessID` = %s ORDER BY `dateSearched` DESC", (sessionUserClass.key, id))
+        historyGuess = cursor.fetchone()
+        if historyGuess == None:
+            return {"success": False, 'message': "History not found!"}
+        print('Approved')
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        resultHistInfo = dict(zip([col[0] for col in cursor.description], historyGuess))
+        
+        cursor.execute("SELECT word FROM `suggestedWord` WHERE `guessID` = %s", (id,))
+        print('Approved')
+        userHistory = cursor.fetchall()
+        print(userHistory)
+
+        if not userHistory:
+            return {"success": False, 'message': "No history found!"}
+
+        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))

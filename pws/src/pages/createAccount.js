@@ -2,6 +2,7 @@ import "./createAccount.css";
 import { useState } from 'react';
 import { sha512 } from 'js-sha512';
 import usePUT from "../functionalities/usePut";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -12,6 +13,7 @@ function CreateAccountPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const navigate = useNavigate();
 
   
   
@@ -44,7 +46,6 @@ function CreateAccountPage() {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
     }).then(res => {
-      console.log("LOOOOOOOOOOOOOOOOOOOL");
       console.log(res);
       if (!res.ok) {
         throw Error('Could not fetch the data for that resource');
@@ -57,6 +58,7 @@ function CreateAccountPage() {
       }
       else {
         alert("Account created successfully");
+        navigate("/login");
       }
     }).catch(error => {
       console.error('Error:', error);

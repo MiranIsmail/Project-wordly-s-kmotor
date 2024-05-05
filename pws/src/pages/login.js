@@ -39,9 +39,10 @@ LoginPage() {
       else {
         // User successfully logged in
 
-        alert(data['message']);
-        const token = sha512(sha512Password + email);
+        // alert(data['message']);
+        const token = data['tokenID'];
         login(token);
+        navigate("/profile");
       }
     }).catch(error => {
       console.error('Error:', error);
