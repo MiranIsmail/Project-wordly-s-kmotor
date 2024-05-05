@@ -29,6 +29,7 @@
     margin-right: auto;
     border: none;
     width: 8%;
+    min-width: 90px;
     border-radius: 10px;
     display: block;
     padding: 10px 20px;

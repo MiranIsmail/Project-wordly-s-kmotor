@@ -2,11 +2,12 @@ import "./userHistory.css";
 import useFetch from "../functionalities/useFetch";
 import { useAuth } from "../auth/authcontext";
 import { Link } from "react-router-dom";
+import { getDate } from "../functionalities/convertDatetime";
 
 
 function UserHistoryPage() {
   const { getToken } = useAuth();
-  const { data: wordles, isPending, error } = useFetch("getUserHistory/", {tokenID: getToken()});
+  const { data: wordles, isPending, error } = useFetch("getUserHistory/", {});
 
 
   return ( 
@@ -44,9 +45,4 @@ function RemoveUnderscores(word) {
     }
   }
   return newWord;
-}
-
-function getDate(date) {
-  let newDate = new Date(date);
-  return newDate.toDateString();
 }

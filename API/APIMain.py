@@ -241,3 +241,38 @@ def get_user_history():
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
+
+# Get specific user history
+@app.get("/getUserHistory/{id}")
+def get_specific_user_history(id: int):
+    cursor = db.cursor()
+
+    # Check if any of the parameters are missing.
+    if not sessionUserClass.key:
+        raise HTTPException(status_code=400, detail="Missing parameter(s)")
+
+    try:
+        # Check if the history exists and is on the same user.
+        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) AND `guessID` = %s ORDER BY `dateSearched` DESC", (sessionUserClass.key, id))
+        historyGuess = cursor.fetchone()
+        if historyGuess == None:
+            return {"success": False, 'message': "History not found!"}
+        print('Approved')
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        resultHistInfo = dict(zip([col[0] for col in cursor.description], historyGuess))
+        
+        cursor.execute("SELECT word FROM `suggestedWord` WHERE `guessID` = %s", (id,))
+        print('Approved')
+        userHistory = cursor.fetchall()
+        print(userHistory)
+
+        if not userHistory:
+            return {"success": False, 'message': "No history found!"}
+
+        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()

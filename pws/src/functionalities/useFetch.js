@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../auth/authcontext';
 
 const useFetch = (path, params) => {
   const [data, setData] = useState(null);
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
   const url = "http://127.0.0.1:8000/";
+  const { getToken } = useAuth();
+
+  if (params.tokenID === undefined) {
+    params.tokenID = getToken();
+  }
 
 
   useEffect(() => {
