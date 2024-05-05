@@ -89,7 +89,7 @@ def read_items(id: int = None):
 def add_words():
     cursor = db.cursor()
 
-    query = "INSERT INTO word (word, length) VALUES (%s, %s)"
+    query = "INSERT INTO word (word, word_length) VALUES (%s, %s)"
 
     try:        
         data = getListOfWordsFromFile()
@@ -149,6 +149,20 @@ def login_user(email: str, psw: str):
 
         return {"success": userKey, 'message': "User logged in successfully!" if userKey else "Invalid credentials!"}
 
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+#returns if five letter word is in the database
+@app.get("/word/")
+def get_word(word: str):
+    cursor = db.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM word WHERE word LIKE %s", (word,))
+        result = cursor.fetchall()
+        return {"exists": [row[0] for row in result]}
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
