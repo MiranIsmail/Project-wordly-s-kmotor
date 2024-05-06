@@ -83,7 +83,7 @@
 }
 .upperdiv {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 50%;
@@ -98,4 +98,7 @@
   border: 1px solid #282c34;
   padding: 5px;
   text-align: center;
+}
+.wordlist {
+  overflow: auto;
 }

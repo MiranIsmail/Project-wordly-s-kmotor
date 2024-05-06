@@ -10,7 +10,6 @@ import postRequest
 import classes
 import json
 from hashlib import sha512
-
 app = FastAPI()
 
 # Load the environment variables from the .env file.
@@ -279,14 +278,17 @@ def get_specific_user_history(id: int):
 
 #returns if five letter word is in the database
 @app.get("/word/")
-def get_word(word: str):
+def get_word(word: str,exclude: str,include: str):
     cursor = db.cursor()
 
     try:
-        cursor.execute("SELECT * FROM word WHERE word LIKE %s", (word,))
+        cursor.execute("SELECT * FROM (SELECT word FROM word WHERE word LIKE BINARY %s) AS wo WHERE wo.word LIKE BINARY %s AND wo.word NOT LIKE BINARY %s", (word,include,exclude))
+        #this will be more efficient if we filter include and exclude on clintside ie this is just for the sake of the assigment
         result = cursor.fetchall()
         return {"exists": [row[0] for row in result]}
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
+
+
