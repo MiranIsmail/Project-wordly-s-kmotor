@@ -1,1 +1,0 @@
-SELECT * FROM word WHERE word_length = 5 ;
