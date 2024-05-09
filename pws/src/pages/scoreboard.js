@@ -5,6 +5,8 @@ function ScoreboardPage() {
   const [scores, setScores] = useState([
     { name: "John Doe", score: 100 },
     { name: "Jane Doe", score: 200 },
+    { name: "Jane Doe", score: 300 },
+    { name: "Jane Doe", score: 400 },
     // Add more scores here
   ]);
   return (

@@ -1,66 +1,66 @@
-
-.loginPage{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    margin-right: auto;
-    margin-left: auto;
-    color: white;
+.loginPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  margin-right: auto;
+  margin-left: auto;
+  color: white;
+  background-color: black;
 }
 
-.loginPage_content{
-    width: 30%;
+.loginPage_content {
+  width: 30%;
 }
 
-
-.loginPage input, .loginPage textarea, .loginPage select {
-    width: 100%;
-    padding: 6px 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-    border-radius: 10px;
-    display: block;
+.loginPage input,
+.loginPage textarea,
+.loginPage select {
+  width: 100%;
+  padding: 6px 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  border-radius: 10px;
+  display: block;
 }
 
-.LoginButton{
-    background-color: #4CAF50;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    border-radius: 10px;
+.LoginButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 10px;
 }
 
 .LoginButton:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
 .signupButton {
-    background-color: #3c168f;
-    color: white;
-    margin-top: 5px; /* Reduced or added top margin if needed for fine-tuning */
-    margin-bottom: 10px; /* Ensure there's some space below the button */
-    margin-left: auto;
-    margin-right: auto;
-    border: none;
-    width: 50%;
-    border-radius: 10px;
-    display: block;
-    padding: 10px 20px;
-    cursor: pointer;
+  background-color: #3c168f;
+  color: white;
+  margin-top: 5px; /* Reduced or added top margin if needed for fine-tuning */
+  margin-bottom: 10px; /* Ensure there's some space below the button */
+  margin-left: auto;
+  margin-right: auto;
+  border: none;
+  width: 50%;
+  border-radius: 10px;
+  display: block;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
 .signupButton:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
-
 .loginPage p {
-    text-align: center; /* Center align the text inside paragraphs */
-    width: 100%; /* Full width for proper alignment */
-    margin-bottom: 0px;
+  text-align: center; /* Center align the text inside paragraphs */
+  width: 100%; /* Full width for proper alignment */
+  margin-bottom: 0px;
 }

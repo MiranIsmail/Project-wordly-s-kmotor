@@ -1,5 +1,6 @@
 import "./navbar.css";
 import logo from "../pics/logo.png";
+import login from "../pics/login.png";
 import audio from "../audio/drive.mp3";
 import React, { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -20,28 +21,10 @@ function Navbar() {
     });
   }, []);
 
-  const handleH3Click = (event) => {
-    const page = event.target.innerText.toLowerCase();
-    window.open = `localhost/${page}`;
-    console.log(page);
-  };
-
-  const handleLogoClick = (event) => {
-    window.open = "localhost";
-  };
-
-  const handleSearch = (event) => {
-    if (event.key === "Enter") {
-      const search = event.target.value.toLowerCase();
-      window.open = `localhost/search/${search}`;
-      event.target.value = "";
-    }
-  };
-
   return (
     <div className="Home">
       <div className="left">
-        <img src={logo} onClick={handleLogoClick} alt="logo" className="logo" />
+        <img src={logo} alt="logo" className="logo" />
         <Link className="HomeLogoLink" to="/">
           <h2>WordleSheet</h2>
         </Link>
@@ -53,12 +36,14 @@ function Navbar() {
       </div>
       <div className="right">
         <div className="menu-space"></div>
-        {isLoggedIn ? <Link to="/profile">Profile</Link> : <Link to="/login">Login</Link>}
-        <input
-          onKeyDown={handleSearch}
-          type="search"
-          placeholder="  Search..."
-        />
+        <div className="logindiv">
+          {isLoggedIn ? (
+            <Link to="/profile">Profile</Link>
+          ) : (
+            <Link to="/login">Log in</Link>
+          )}
+        </div>
+        <div className="space"></div>
       </div>
     </div>
   );

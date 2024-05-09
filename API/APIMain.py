@@ -25,7 +25,8 @@ db = mysql.connector.connect(
     host=secretInfo["host"],
     user=secretInfo["user"],
     password=secretInfo["password"],
-    database=secretInfo["database"]
+    database=secretInfo["database"],
+    charset='utf8mb4'  # Add this line
 )
 
 sessionUserClass = classes.UserSessionData()
@@ -280,9 +281,18 @@ def get_specific_user_history(id: int):
 @app.get("/word/")
 def get_word(word: str,exclude: str,include: str):
     cursor = db.cursor()
+    word = word.lower()
+    exclude = exclude.lower()
+    include = include.lower()
+
 
     try:
-        cursor.execute("SELECT * FROM (SELECT word FROM word WHERE word LIKE BINARY %s) AS wo WHERE wo.word LIKE BINARY %s AND wo.word NOT LIKE BINARY %s", (word,include,exclude))
+        cursor.execute("""
+    SELECT * FROM 
+    (SELECT word FROM word WHERE word COLLATE utf8mb4_bin LIKE %s) AS wo 
+    WHERE wo.word COLLATE utf8mb4_bin LIKE %s 
+    AND wo.word COLLATE utf8mb4_bin NOT LIKE %s
+""", (word, include, exclude))
         #this will be more efficient if we filter include and exclude on clintside ie this is just for the sake of the assigment
         result = cursor.fetchall()
         return {"exists": [row[0] for row in result]}
