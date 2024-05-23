@@ -8,8 +8,19 @@ function FrontPage() {
   const letter3 = useRef();
   const letter4 = useRef();
   const letter5 = useRef();
-  const letterstoexclude = useRef();
-  const letterstoinclude = useRef();
+  const lettersToExclude = useRef();
+  const lettersToInclude = useRef();
+
+  const resetLetters = () => {
+    letter1.current.value = "";
+    letter2.current.value = "";
+    letter3.current.value = "";
+    letter4.current.value = "";
+    letter5.current.value = "";
+    lettersToExclude.current.value = "";
+    lettersToInclude.current.value = "";
+  };
+
 
   const handleSubmit = () => {
     if (letter1.current.value === "") {
@@ -27,11 +38,11 @@ function FrontPage() {
     if (letter5.current.value === "") {
       letter5.current.value = "_";
     }
-    if (letterstoexclude.current.value === "") {
-      letterstoexclude.current.value = "£";
+    if (lettersToExclude.current.value === "") {
+      lettersToExclude.current.value = "£";
     }
-    if (letterstoinclude.current.value === "") {
-      letterstoinclude.current.value = letter1.current.value;
+    if (lettersToInclude.current.value === "") {
+      lettersToInclude.current.value = letter1.current.value;
     }
     const word =
       letter1.current.value +
@@ -39,21 +50,36 @@ function FrontPage() {
       letter3.current.value +
       letter4.current.value +
       letter5.current.value;
-    const exclude = "%" + letterstoexclude.current.value + "%";
-    const include = "%" + letterstoinclude.current.value + "%";
+    const exclude = lettersToExclude.current.value;
+    const include = lettersToInclude.current.value;
     fetch(
       `http://localhost:8000/word/?word=${word}&exclude=${exclude}&include=${include}`
     )
       .then((response) => response.json())
       .then((data) => {
         setData(data);
-        letter1.current.value = "";
-        letter2.current.value = "";
-        letter3.current.value = "";
-        letter4.current.value = "";
-        letter5.current.value = "";
-        letterstoexclude.current.value = "";
-        letterstoinclude.current.value = "";
+        // Revett characters to default if = _
+        if (letter1.current.value === "_") {
+          letter1.current.value = "";
+        }
+        if (letter2.current.value === "_") {
+          letter2.current.value = "";
+        }
+        if (letter3.current.value === "_") {
+          letter3.current.value = "";
+        }
+        if (letter4.current.value === "_") {
+          letter4.current.value = "";
+        }
+        if (letter5.current.value === "_") {
+          letter5.current.value = "";
+        }
+        if (lettersToExclude.current.value === "£") {
+          lettersToExclude.current.value = "";
+        }
+        if (lettersToInclude.current.value === letter1.current.value) {
+          lettersToInclude.current.value = "";
+        }
       })
       .catch((error) => console.error("Error:", error));
   };
@@ -86,14 +112,14 @@ function FrontPage() {
           <input //RIGHT NOW WE DO ONLY ONE LETTER// THIS SHOULD BE FIXED TO HAVE MORE LETTERS// DO IT AFTER ASSIGMENT !!!!!!!
             type="text"
             placeholder="Enter a letter to exclude"
-            maxLength={1}
-            ref={letterstoexclude}
+            maxLength={50}
+            ref={lettersToExclude}
           />
           <input
             type="text"
             placeholder="Enter a letter to include"
-            maxLength={1}
-            ref={letterstoinclude}
+            maxLength={50}
+            ref={lettersToInclude}
           />
         </div>
         <button onClick={handleSubmit}>Submit</button>

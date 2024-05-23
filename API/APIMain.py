@@ -282,17 +282,30 @@ def get_specific_user_history(id: int):
 def get_word(word: str,exclude: str,include: str):
     cursor = db.cursor()
     word = word.lower()
+    word = "'"+word+"'"
     exclude = exclude.lower()
     include = include.lower()
 
+    print(word)
+    print(exclude)
+    print(include)
 
+    includeText = "wo.word COLLATE utf8mb4_bin LIKE '%" + include[0] + "%'"
+    for i in range(1, len(include)):
+        includeText += " AND wo.word COLLATE utf8mb4_bin LIKE '%" + include[i]+"%'"
+    
+    print(includeText)
+
+    excludeText = "wo.word COLLATE utf8mb4_bin NOT LIKE '%" + exclude[0] + "%'"
+    for i in range(1, len(exclude)):
+        excludeText += " AND wo.word COLLATE utf8mb4_bin NOT LIKE '%" + exclude[i]+"%'"
+
+    print(excludeText)
+
+    sendText = "SELECT * FROM (SELECT word FROM word WHERE word COLLATE utf8mb4_bin LIKE "+ word +") AS wo WHERE ("+ includeText +") AND ("+ excludeText +")"
+    print(sendText)
     try:
-        cursor.execute("""
-    SELECT * FROM 
-    (SELECT word FROM word WHERE word COLLATE utf8mb4_bin LIKE %s) AS wo 
-    WHERE wo.word COLLATE utf8mb4_bin LIKE %s 
-    AND wo.word COLLATE utf8mb4_bin NOT LIKE %s
-""", (word, include, exclude))
+        cursor.execute(sendText)
         #this will be more efficient if we filter include and exclude on clintside ie this is just for the sake of the assigment
         result = cursor.fetchall()
         return {"exists": [row[0] for row in result]}
