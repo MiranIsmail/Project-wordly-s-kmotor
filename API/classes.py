@@ -5,4 +5,3 @@ class UserSessionData:
 
     def setKey(self, key):
         self.key = key
-    

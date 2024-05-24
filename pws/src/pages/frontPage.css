@@ -5,7 +5,7 @@
   align-items: center;
   height: 93vh;
   width: 100%;
-  background-color: #000000;
+  background-color: rgb(71, 71, 71);
   color: #ffffff;
 }
 .middlediv {
@@ -16,7 +16,7 @@
   width: 50%;
   height: 33%;
   background-color: #f5f5f5;
-  border: #282c34 10px groove;
+  /* border: #282c34 10px groove; */
   border-radius: 25px;
   padding: 10px;
 }
@@ -45,7 +45,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-top: 2%;
+  /* padding-top: 2%; */
   width: 60%;
   height: 33%;
 }
@@ -68,9 +68,9 @@
 }
 .middlediv > button {
   width: 50%;
-  height: 10%;
+  /* height: 10%; */
   font-size: 1.5em;
-  border: 1px solid #1955cc;
+  /* border: 1px solid #1955cc; */
   border-radius: 15px;
   padding: 5px;
   color: #ffffff;
@@ -87,7 +87,8 @@
   justify-content: center;
   align-items: center;
   width: 50%;
-  height: 33%;
+  height: 50%;
+  padding-bottom: 10px;
 }
 .upperdiv > h1 {
   font-size: 2em;
@@ -99,6 +100,91 @@
   padding: 5px;
   text-align: center;
 }
+
+.resetSearch {
+  padding-bottom: 5%;
+  /* align-items: center; */
+}
+.resetSearch > button{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  background-color: #000000;
+  color: #ffffff;
+  font-size: medium;
+  padding: 8px;
+}
+.resetSearch > button:hover{
+  background-color: #646464;
+  cursor: pointer;
+}
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* ::-webkit-scrollbar-track {
+  background: rgb(71, 71, 71);
+} */
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.wordPart {
+  display: flex;
+  overflow: auto;
+  /* when chaning the width, the top word as currently seen will be still */
+  overflow-y: auto;
+  flex-direction: row;
+  justify-content: space-between;
+  /* min-height: 200px; */
+}
+
+
 .wordlist {
   overflow: auto;
+}
+.wordlist > button:hover{
+  cursor: pointer;
+}
+
+.wordlist > button{
+  flex-direction: row;
+  border: #000000 0px solid;
+  background-color: #000000;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  color: #ffffff;
+  font-size: medium;
+  padding: 8px;
+  margin: 5px;
+}
+
+.foundWordPart{
+  flex: auto;
+  text-align: center;
+  margin: 5px;
+}
+
+.foundWordPart button{
+  border: #000000 0px solid;
+  background-color: #166cff;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  color: #ffffff;
+  font-size: medium;
+  padding: 8px;
+  margin: 5px;
+}
+
+.foundWordPart button:hover{
+  background-color: #3881ff;
+  cursor: pointer;
 }

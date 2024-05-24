@@ -1,16 +1,17 @@
 .scoreboard {
-  width: 100%;
+  /* width: 100%; */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  background-color: black;
-  height: 100vh;
+  background-color: rgb(71, 71, 71);
+  /* height: 100vh; */
 }
 
 .scoreboard_header {
   margin-bottom: 20px;
   width: 50%;
+  color: white;
 }
 
 .scoreboard_content {

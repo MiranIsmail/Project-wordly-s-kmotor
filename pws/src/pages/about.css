@@ -4,9 +4,7 @@
   justify-content: center;
   align-items: center;
   color: #ffffff;
-  background-color: #000000;
-  height: 100vh;
-  width: 100vw;
+  background-color: rgb(71, 71, 71);
 }
 
 .home_header {

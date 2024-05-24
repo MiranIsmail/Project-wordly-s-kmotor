@@ -66,6 +66,15 @@ app.add_middleware(
 )
 
 
+def getUserID(tokenID):
+    cursor = db.cursor()
+    cursor.execute("SELECT `UserID` FROM `user` WHERE `tokenID` = %s", (tokenID,))
+    try:
+        userID = cursor.fetchone()[0]
+        return userID
+    except:
+        return -1
+
 #Views go here
 
 # This is only for testing purposes.
@@ -224,13 +233,15 @@ def get_user_history():
         raise HTTPException(status_code=400, detail="Missing parameter(s)")
 
     try:
-        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC", (sessionUserClass.key,))
 
+        cursor.execute("SELECT * FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC", (sessionUserClass.key,))
         userHistory = cursor.fetchall()
         columns = [col[0] for col in cursor.description]
 
         # Mapping each row of userHistory to a dictionary with keys as column names
         result = [dict(zip(columns, row)) for row in userHistory]
+
+        # print(result)
 
         if not userHistory:
             return {"success": False, 'message': "No history found!"}
@@ -269,8 +280,12 @@ def get_specific_user_history(id: int):
 
         if not userHistory:
             return {"success": False, 'message': "No history found!"}
+        
+        # Gets the correct word if it exists.
+        cursor.execute("SELECT `word` FROM `FoundWord` WHERE `guessID` = %s", (id,))
+        foundWord = cursor.fetchone()
 
-        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory}
+        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory, 'FoundWord': foundWord[0] if foundWord else None}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -282,6 +297,7 @@ def get_specific_user_history(id: int):
 def get_word(word: str,exclude: str,include: str):
     cursor = db.cursor()
     word = word.lower()
+    charWord = word
     word = "'"+word+"'"
     exclude = exclude.lower()
     include = include.lower()
@@ -302,12 +318,33 @@ def get_word(word: str,exclude: str,include: str):
 
     print(excludeText)
 
-    sendText = "SELECT * FROM (SELECT word FROM word WHERE word COLLATE utf8mb4_bin LIKE "+ word +") AS wo WHERE ("+ includeText +") AND ("+ excludeText +")"
+    sendText = "SELECT * FROM (SELECT word FROM word WHERE word COLLATE utf8mb4_bin LIKE "+ word +") AS wo WHERE ("+ includeText +") AND ("+ excludeText +") LIMIT 200"
     print(sendText)
     try:
         cursor.execute(sendText)
         #this will be more efficient if we filter include and exclude on clintside ie this is just for the sake of the assigment
         result = cursor.fetchall()
+        resultList = [row[0] for row in result]
+        print(resultList)
+
+        # If the user is logged in, add the search to the history.
+        if sessionUserClass.key != 'null':
+            print(sessionUserClass.key)
+            print('User is logged in')
+            userID = getUserID(sessionUserClass.key)
+            print(userID)
+            cursor.execute("""
+            INSERT INTO guessHistory (`UserID`, `dateSearched`, `correctCharPos`, `includedChars`, `excludedChars`) Values
+            (%s, NOW(), %s, %s, %s)
+            """, (userID, charWord, include, exclude))
+
+            guessID = cursor.lastrowid
+
+            # Execute many
+            suggestedWords = [(guessID, word) for word in resultList]
+            cursor.executemany("INSERT INTO suggestedWord (`guessID`, `word`) VALUES (%s, %s)", suggestedWords)
+            db.commit()
+
         return {"exists": [row[0] for row in result]}
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -315,3 +352,34 @@ def get_word(word: str,exclude: str,include: str):
         cursor.close()
 
 
+@app.post("/correctWordGotten/")
+def correct_word_gotten(word: str):
+    cursor = db.cursor()
+    print(word)
+
+    try:
+        userID = getUserID(sessionUserClass.key)
+        print('userID = ' + str(userID))
+        cursor.execute("SELECT guessID FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC LIMIT 1", (sessionUserClass.key,))
+
+        userHistory = cursor.fetchall()
+        guessID = userHistory[0][0]
+
+        print(guessID, word)
+        cursor.execute("SELECT `guessID` FROM `FoundWord` WHERE `guessID` = %s", (guessID,))
+
+        # Remove the word from the FoundWord table if it already exists.
+        if cursor.fetchone():
+            cursor.execute("DELETE FROM FoundWord WHERE `guessID` = %s", (guessID,))
+            print('Deleted word from FoundWord table because it already existed.')
+
+        print('Inserting word into FoundWord table...')
+        cursor.execute("INSERT INTO FoundWord (`guessID`, `word`) VALUES (%s, %s)", (guessID, word))
+        db.commit()
+
+        return {"success": True, "message": "Data sent!!"}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()

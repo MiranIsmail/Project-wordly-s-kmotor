@@ -16,7 +16,7 @@
 .history_search_content{
     display: flex;
     flex-direction: row;
-    align-items: center;
+    /* align-items: center; */
     justify-content: space-between;
     width: 100%;
     margin-bottom: 10px;
@@ -39,4 +39,19 @@
     margin-bottom: 10px;
     border-radius: 10px;
     text-decoration: none;
+}
+
+.foundWordPart {
+    display: flex;
+    align-items: center;
+}
+
+.foundWordPart h1 {
+    flex-direction: row;
+    margin-left: 10px;
+    font-size: 20px;
+    padding: 5px 10px;
+    background-color: rgb(26, 26, 26);
+    color: limegreen;
+    border-radius: 10px;
 }

@@ -16,7 +16,8 @@ function UserHistoryPage() {
         <h1>User History</h1>
       </div>
         {isPending && <h1>Loading...</h1>}
-        {!isPending && wordles.history.map((wordle) => (
+        {/* {wordles.success && <h1>{wordles.message}</h1>} */}
+        {(!isPending) && (wordles.success && wordles.history.map((wordle) => (
           <div className="wordle_preview" key={wordle.id}>
             <Link to={`/historyDetail/${wordle.guessID}`}>
               <h2>{getDate(wordle.dateSearched)}</h2>
@@ -26,7 +27,8 @@ function UserHistoryPage() {
               </div>
             </Link>
           </div>
-        ))}
+        )))}
+        {(!isPending) && (!wordles.success) && <h1>{wordles.message}</h1>}
     </div>
    );
 }

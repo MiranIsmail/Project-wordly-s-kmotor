@@ -1,5 +1,6 @@
 import "./frontPage.css";
 import React, { useRef, useState } from "react";
+import { useAuth } from '../auth/authcontext';
 
 function FrontPage() {
   const [data, setData] = useState(null);
@@ -10,6 +11,9 @@ function FrontPage() {
   const letter5 = useRef();
   const lettersToExclude = useRef();
   const lettersToInclude = useRef();
+  const { getToken } = useAuth();
+
+  const [foundWordIndex, setIndex] = useState(-1);
 
   const resetLetters = () => {
     letter1.current.value = "";
@@ -21,8 +25,56 @@ function FrontPage() {
     lettersToInclude.current.value = "";
   };
 
+  const selectFoundWord = (index) => {
+    console.log(data.exists[index] + " - " + index);
+    if (index === foundWordIndex) {
+      setIndex(-1);
+      return;
+    }
+    setIndex(index);
+  }
+
+  const sendWord = (wordIn) => {
+    console.log("Correct word being sent - " + wordIn);
+    // Asks the user if the word is correct with alert
+    // If yes, send the word to the backend
+    // If no, do nothing
+    const confirmWord = window.confirm("Was "+ wordIn +" the correct word? The result will be stored.");
+    console.log("Confirm word: " + confirmWord);
+    if (confirmWord) {
+      // Send the data to the server
+      fetch('http://127.0.0.1:8000/correctWordGotten/?' + new URLSearchParams({
+        word: wordIn, 
+        tokenID: getToken()
+      }), {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+      }).then(res => {
+        console.log(res);
+        if (!res.ok) {
+          throw Error('Could not fetch the data for that resource');
+        }
+        return res.json();
+      }).then(data => {
+        console.log(data);
+        if (data['success'] === 0) {
+          alert(data['detail']);
+        }
+        else {
+          alert("Data stored successfully");
+        }
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+  }
+
 
   const handleSubmit = () => {
+
+    setIndex(-1);
+
     if (letter1.current.value === "") {
       letter1.current.value = "_";
     }
@@ -53,7 +105,7 @@ function FrontPage() {
     const exclude = lettersToExclude.current.value;
     const include = lettersToInclude.current.value;
     fetch(
-      `http://localhost:8000/word/?word=${word}&exclude=${exclude}&include=${include}`
+      `http://localhost:8000/word/?word=${word}&exclude=${exclude}&include=${include}&tokenID=${getToken()}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -91,16 +143,57 @@ function FrontPage() {
           <h1>Enter the part of the word you know</h1>
         </div>
         {data && <h5>Words that match your criteria:</h5>}
-        <div
-          className="wordlist" /*TEMPORARY FIX THIS SHOULD BE MUCH MORE USER FRIENDLY!!!!*/
-        >
-          {data &&
-            data.exists.map((item, index) => (
-              <div key={index}>{item}</div>
-            ))}{" "}
+        <div className="wordPart">
+          <div className="wordlist" /*TEMPORARY FIX THIS SHOULD BE MUCH MORE USER FRIENDLY!!!!*/
+            style={{ 
+              width: "75%",
+            }}
+          >
+            {data &&
+              data.exists.map((item, index) => (
+                <button
+                  style={{ 
+                    // background color is limegreen when choosen
+                    background: index === foundWordIndex ? "limegreen " : "white",
+                    color: index === foundWordIndex ? "white" : "black",
+                  }}
+                  onClick={() => {
+                    selectFoundWord(index);
+                  }}
+                >
+                  {item}
+                </button>
+              ))}{" "}
+          </div>
+          <div className="foundWordPart"
+            style={{ 
+              width: "25%",
+            }}
+          >
+            {data && foundWordIndex === -1 &&
+              <h3>Click on a word to see it</h3>
+            }
+            {data && foundWordIndex !== -1 && 
+              <div className="contentWordPart">
+                <h3>Correct word?</h3>
+                <h2>{data.exists[foundWordIndex]}</h2>
+                <button
+                  onClick={() => {
+                    sendWord(data.exists[foundWordIndex]);
+                  }}
+                >
+                  Yes it is!
+                </button>
+
+              </div>
+            }
+          </div>
         </div>
       </div>
       <div className="middlediv">
+        <div className="resetSearch">
+          <button onClick={resetLetters}>Reset inputs</button>
+        </div>
         <div className="word">
           <input type="text" placeholder="W" maxLength={1} ref={letter1} />
           <input type="text" placeholder="O" maxLength={1} ref={letter2} />
@@ -109,22 +202,22 @@ function FrontPage() {
           <input type="text" placeholder="S" maxLength={1} ref={letter5} />
         </div>
         <div className="letters">
-          <input //RIGHT NOW WE DO ONLY ONE LETTER// THIS SHOULD BE FIXED TO HAVE MORE LETTERS// DO IT AFTER ASSIGMENT !!!!!!!
+          <input 
             type="text"
-            placeholder="Enter a letter to exclude"
+            placeholder="Excluded letters"
             maxLength={50}
             ref={lettersToExclude}
           />
           <input
             type="text"
-            placeholder="Enter a letter to include"
+            placeholder="Included letters"
             maxLength={50}
             ref={lettersToInclude}
           />
         </div>
         <button onClick={handleSubmit}>Submit</button>
       </div>
-      <div className="lowerdiv"></div>
+      {/* <div className="lowerdiv"></div> */}
     </div>
   );
 }

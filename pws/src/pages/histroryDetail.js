@@ -1,11 +1,23 @@
 import { useParams } from "react-router-dom";
 import useFetch from "../functionalities/useFetch";
 import { getDate } from "../functionalities/convertDatetime";
+import { useState, useEffect  } from "react";
 import "./historyDetail.css";
 
 function HistoryDetailPage() {
   const {guessID} = useParams();
   const { data: data, isPending, error } = useFetch(`getUserHistory/${guessID}`, {});
+  const [foundWordToShow, setFoundWordIndex] = useState(null);
+
+  useEffect(() => {
+    // This effect will run whenever 'data' changes
+    if (data && data.FoundWord) {
+      // Assuming 'data.FoodWord' is the index or contains the index you need
+      setFoundWordIndex(data.FoundWord); // Update the state with the new index
+    }
+  }, [data]); // Dependency array includes 'data' to trigger effect when 'data' changes
+
+  
   console.log(data);
 
   return ( 
@@ -18,11 +30,24 @@ function HistoryDetailPage() {
             <p>Correct characters and positions: {data.historyInfo.correctCharPos}</p>
             <p>Correct characters with unknown position: {data.historyInfo.unknownChars}</p>
             <p>Excluded characters: {data.historyInfo.excludedChars}</p>
+            
+            {foundWordToShow !== null && 
+              <div className="foundWordPart">
+                <h2>Correct word on search: </h2>
+                <h1>{foundWordToShow}</h1>
+              </div>
+            }
           </div>
           <div className="list_of_suggested_words">
             <h3>List of suggested words</h3>
             {data.suggestedWords.map((word, index) => (
-              <div className="suggested_word" key={index}>
+              <div 
+                className="suggested_word" 
+                key={index}
+                style={{
+                  color: foundWordToShow == word ? "limegreen" : "white",
+                }}
+              >
                   {word[0]}
               </div>
             ))}
