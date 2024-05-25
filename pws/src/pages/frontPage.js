@@ -14,6 +14,7 @@ function FrontPage() {
   const { getToken } = useAuth();
 
   const [foundWordIndex, setIndex] = useState(-1);
+  const [loading, setLoading] = useState(false);
 
   const resetLetters = () => {
     letter1.current.value = "";
@@ -104,6 +105,9 @@ function FrontPage() {
       letter5.current.value;
     const exclude = lettersToExclude.current.value;
     const include = lettersToInclude.current.value;
+
+    setLoading(true);
+
     fetch(
       `http://localhost:8000/word/?word=${word}&exclude=${exclude}&include=${include}&tokenID=${getToken()}`
     )
@@ -132,8 +136,9 @@ function FrontPage() {
         if (lettersToInclude.current.value === letter1.current.value) {
           lettersToInclude.current.value = "";
         }
+        setLoading(false);
       })
-      .catch((error) => console.error("Error:", error));
+      .catch(error => {console.error("Error:", error); setLoading(false);});
   };
 
   return (
@@ -143,8 +148,8 @@ function FrontPage() {
           <h1>Enter the part of the word you know</h1>
         </div>
         {data && <h5>Words that match your criteria:</h5>}
-        <div className="wordPart">
-          <div className="wordlist" /*TEMPORARY FIX THIS SHOULD BE MUCH MORE USER FRIENDLY!!!!*/
+        {!loading ? <div className="wordPart">
+          <div className="wordlist"
             style={{ 
               width: "75%",
             }}
@@ -188,7 +193,7 @@ function FrontPage() {
               </div>
             }
           </div>
-        </div>
+        </div>: <h1>Loading...</h1>}
       </div>
       <div className="middlediv">
         <div className="resetSearch">

@@ -16,6 +16,7 @@ LoginPage() {
   }
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     const sha512Password = sha512(password);
 
     console.log("Email: ", email, "Password: ", password);
@@ -61,7 +62,7 @@ LoginPage() {
       </div>
       <div className="loginPage_content">
         {/* Form for filling in credentials */}
-        <form onSubmit={handleClick}>
+        <form onSubmit={handleSubmit}>
           <label for="email">Email:</label>
           <input 
             type="email" 
@@ -80,15 +81,15 @@ LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)} 
           />
-          <button onClick={handleSubmit} className="LoginButton">Login</button>
-          <p>Don't have an account?</p>
-          <button
-            className="signupButton"
-            onClick={handleSignup}
-          >
-          Sign up
-          </button>
+          <button className="LoginButton">Login</button>
         </form>
+        <p>Don't have an account?</p>
+        <button
+          className="signupButton"
+          onClick={handleSignup}
+        >
+        Sign up
+        </button>
       </div>
     </div>
    );

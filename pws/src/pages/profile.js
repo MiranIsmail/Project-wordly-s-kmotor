@@ -2,15 +2,15 @@ import "./profile.css";
 import { useAuth } from "../auth/authcontext";
 import useFetch from "../functionalities/useFetch";
 import { useNavigate } from "react-router-dom";
-
+import ScoreboardList from "../customComp/scoreboardList";
 
 function ProfilePage() {
   const { getToken } = useAuth();
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-
   const { data: info, isPending, error } = useFetch("getUserInfo/", {tokenID: getToken()});
+
 
   const handleLogoutClick = (e) => {
     e.preventDefault();
@@ -51,10 +51,18 @@ function ProfilePage() {
         >
           <p>See wordle history</p>
         </button>
-        <p>
-          This is a very simple search motor for words that can be used to solve
-        </p>
-        <p className="p2"> We hope you enjoy it and welcome any feedback.</p>
+        <div className="scoreboard">
+          {isPending && <h1>Loading...</h1>}
+          {!isPending && 
+          <div className="scoreboardRow">
+            <ScoreboardList list={info.scoreboard.top10Found} title="Top 10 gathered words"/>
+            <div className="amountOfsearches">
+              <h2>Amount of total searches: </h2>
+              <h1>{info.scoreboard.amountSearches}</h1>
+            </div>
+          </div>
+          }
+        </div>
       </div>
     </div>
   );

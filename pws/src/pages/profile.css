@@ -19,7 +19,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    width: 80%;
 }
+.profile_content button{
+    width: 80%;
+}
+
+
 .logout_button{
     background-color: #3c168f;
     color: white;
@@ -50,4 +56,26 @@
     display: block;
     padding: 10px 20px;
     cursor: pointer;
+}
+
+.scoreboardRow {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.amountOfsearches {
+    margin-left: 50px;
+    text-align: center;
+    align-items: center;
+}
+
+.amountOfsearches h1 {
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: rgb(60, 60, 60);
+    margin-bottom: 10px;
+    border-radius: 10px;
+    height: 50px;
 }

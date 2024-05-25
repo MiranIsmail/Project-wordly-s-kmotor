@@ -11,9 +11,9 @@ function HistoryDetailPage() {
 
   useEffect(() => {
     // This effect will run whenever 'data' changes
-    if (data && data.FoundWord) {
+    if (data && data.foundWord) {
       // Assuming 'data.FoodWord' is the index or contains the index you need
-      setFoundWordIndex(data.FoundWord); // Update the state with the new index
+      setFoundWordIndex(data.foundWord); // Update the state with the new index
     }
   }, [data]); // Dependency array includes 'data' to trigger effect when 'data' changes
 

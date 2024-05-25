@@ -216,7 +216,7 @@ def get_user_info(tokenID: str):
 
         userInfo = cursor.fetchone()
 
-        return {"success": True, 'email': userInfo[0], 'firstName': userInfo[1], 'lastName': userInfo[2]}
+        return {"success": True, 'email': userInfo[0], 'firstName': userInfo[1], 'lastName': userInfo[2], 'scoreboard': get_profile_scoreboard()}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -282,10 +282,10 @@ def get_specific_user_history(id: int):
             return {"success": False, 'message': "No history found!"}
         
         # Gets the correct word if it exists.
-        cursor.execute("SELECT `word` FROM `FoundWord` WHERE `guessID` = %s", (id,))
+        cursor.execute("SELECT `word` FROM `foundWord` WHERE `guessID` = %s", (id,))
         foundWord = cursor.fetchone()
 
-        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory, 'FoundWord': foundWord[0] if foundWord else None}
+        return {"success": True, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory, 'foundWord': foundWord[0] if foundWord else None}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -366,18 +366,75 @@ def correct_word_gotten(word: str):
         guessID = userHistory[0][0]
 
         print(guessID, word)
-        cursor.execute("SELECT `guessID` FROM `FoundWord` WHERE `guessID` = %s", (guessID,))
+        cursor.execute("SELECT `guessID` FROM `foundWord` WHERE `guessID` = %s", (guessID,))
 
-        # Remove the word from the FoundWord table if it already exists.
+        # Remove the word from the foundWord table if it already exists.
         if cursor.fetchone():
-            cursor.execute("DELETE FROM FoundWord WHERE `guessID` = %s", (guessID,))
-            print('Deleted word from FoundWord table because it already existed.')
+            cursor.execute("DELETE FROM foundWord WHERE `guessID` = %s", (guessID,))
+            print('Deleted word from foundWord table because it already existed.')
 
-        print('Inserting word into FoundWord table...')
-        cursor.execute("INSERT INTO FoundWord (`guessID`, `word`) VALUES (%s, %s)", (guessID, word))
+        print('Inserting word into foundWord table...')
+        cursor.execute("INSERT INTO foundWord (`guessID`, `word`) VALUES (%s, %s)", (guessID, word))
         db.commit()
 
         return {"success": True, "message": "Data sent!!"}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+@app.get("/getProfileScoreboard/")
+def get_profile_scoreboard():
+    cursor = db.cursor()
+
+    try:
+        cursor.execute("""SELECT word as text, COUNT(*) as amount FROM `foundWord` 
+            INNER JOIN `guessHistory` ON `foundWord`.`guessID` = `guessHistory`.`guessID` 
+            INNER JOIN `user` ON `guessHistory`.`UserID` = `user`.`UserID` WHERE `user`.`tokenID` = %s GROUP BY word ORDER BY COUNT(*) DESC LIMIT 10""",
+            (sessionUserClass.key,)
+            )
+        userScoreboard = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        result = [dict(zip(columns, row)) for row in userScoreboard]
+
+        # get the amopunt of times a user has searched for a word
+        cursor.execute("SELECT COUNT(*) as amount FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s)", (sessionUserClass.key,))
+        userSearches = cursor.fetchone()[0]
+
+        return {"success": True, 'top10Found': result, 'amountSearches': userSearches}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+
+@app.get("/getScoreboard/")
+def get_scoreboard():
+    cursor = db.cursor()
+
+    try:
+        cursor.execute("""SELECT CONCAT(`firstName`, ' ', `lastName`) as text, count(*) as amount FROM `user` 
+            INNER JOIN `guessHistory` ON `user`.`UserID` = `guessHistory`.`UserID` GROUP BY `user`.`UserID` 
+            ORDER BY COUNT(`guessHistory`.`UserID`) DESC LIMIT 10;"""
+            )
+        userScoreboard = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        result = [dict(zip(columns, row)) for row in userScoreboard]
+
+        cursor.execute("SELECT word as text, count(*) as amount FROM `foundWord` GROUP BY word ORDER BY COUNT(*) DESC LIMIT 10;")
+        top10Found = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+
+        # Mapping each row of userHistory to a dictionary with keys as column names
+        top10Found = [dict(zip(columns, row)) for row in top10Found]
+
+        return {"success": True, 'top10Searched': result, 'top10Found': top10Found}
 
     except Error as e:
         raise HTTPException(status_code=500, detail=str(e))
