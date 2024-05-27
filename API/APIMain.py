@@ -100,7 +100,7 @@ def read_items(id: int = None):
 def add_words():
     cursor = db.cursor()
 
-    query = "INSERT INTO word (word, word_length) VALUES (%s, %s)"
+    query = "INSERT INTO word (word, length) VALUES (%s, %s)"
 
     try:        
         data = getListOfWordsFromFile()
@@ -132,7 +132,11 @@ def create_user(email: str, psw: str, fName: str, lName: str):
         tokenID = sha512((email + psw).encode()).hexdigest()
         cursor.execute("SELECT CreateUser(%s, %s, %s, %s, %s) as accountCreated", (tokenID, email, fName, lName, psw))
 
+        print('Checking if user could be created...')
+
         couldCreate = cursor.fetchone()[0]
+
+        print('User created successfully!' if couldCreate == 1 else 'User already exists!')
 
         return {"success": couldCreate, "message": "User created successfully!" if couldCreate == 1 else "User already exists!"}
 
@@ -279,7 +283,7 @@ def get_specific_user_history(id: int):
         print(userHistory)
 
         if not userHistory:
-            return {"success": False, 'message': "No history found!"}
+            return {"success": False, 'historyInfo': resultHistInfo, 'suggestedWords': userHistory, 'foundWord': None}
         
         # Gets the correct word if it exists.
         cursor.execute("SELECT `word` FROM `foundWord` WHERE `guessID` = %s", (id,))
@@ -360,21 +364,25 @@ def correct_word_gotten(word: str):
     try:
         userID = getUserID(sessionUserClass.key)
         print('userID = ' + str(userID))
+
+        # If user is not logged in, store the word in the foundWord table with no guessID.
+        if userID == -1:
+            cursor.execute("INSERT INTO foundWord (`guessID`, `word`) VALUES (%s, %s)", (None, word))
+            db.commit()
+            return {"success": True, "message": "Data stored without an logged in user"}
+
         cursor.execute("SELECT guessID FROM `guessHistory` WHERE `UserID` = (SELECT `UserID` FROM `user` WHERE `tokenID` = %s) ORDER BY `dateSearched` DESC LIMIT 1", (sessionUserClass.key,))
 
         userHistory = cursor.fetchall()
         guessID = userHistory[0][0]
 
         print(guessID, word)
-        cursor.execute("SELECT `guessID` FROM `foundWord` WHERE `guessID` = %s", (guessID,))
 
-        # Remove the word from the foundWord table if it already exists.
-        if cursor.fetchone():
-            cursor.execute("DELETE FROM foundWord WHERE `guessID` = %s", (guessID,))
-            print('Deleted word from foundWord table because it already existed.')
+        
 
         print('Inserting word into foundWord table...')
-        cursor.execute("INSERT INTO foundWord (`guessID`, `word`) VALUES (%s, %s)", (guessID, word))
+        # Found words with the same guessID are deleted when a new word is inserted inside of the following procedure.
+        cursor.execute("CALL InsertAndCleanFoundWord(%s, %s)", (guessID, word))
         db.commit()
 
         return {"success": True, "message": "Data sent!!"}

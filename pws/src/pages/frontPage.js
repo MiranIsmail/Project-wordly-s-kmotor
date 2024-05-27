@@ -62,7 +62,7 @@ function FrontPage() {
           alert(data['detail']);
         }
         else {
-          alert("Data stored successfully");
+          alert(data['message']);
         }
       }).catch(error => {
         console.error('Error:', error);
@@ -148,7 +148,7 @@ function FrontPage() {
           <h1>Enter the part of the word you know</h1>
         </div>
         {data && <h5>Words that match your criteria:</h5>}
-        {!loading ? <div className="wordPart">
+        {!loading ? <div className="wordPart" style={{minWidth: '100%'}}>
           <div className="wordlist"
             style={{ 
               width: "75%",
