@@ -28,7 +28,7 @@ function HistoryDetailPage() {
           <div className="history_search_info">
             <h2>{getDate(data.historyInfo.dateSearched)}</h2>
             <p>Correct characters and positions: {data.historyInfo.correctCharPos}</p>
-            <p>Correct characters with unknown position: {data.historyInfo.unknownChars}</p>
+            <p>Correct characters with unknown position: {data.historyInfo.includedChars}</p>
             <p>Excluded characters: {data.historyInfo.excludedChars}</p>
             
             {foundWordToShow !== null && 
